@@ -1,19 +1,19 @@
 #include"FE.h"
 cv::Mat* FE(const int nelx, const int nely, const cv::Mat& x, const float penal, cv::Mat* ptrU) {
-	//¼ÆËãµ¥Ôª¸Õ¶È¾ØÕó
+	//è®¡ç®—å•å…ƒåˆšåº¦çŸ©é˜µ
 	cv::Mat *ptrKE = new cv::Mat(lk());
-	//×ÜÌå¸Õ¶È¾ØÕó
+	//æ€»ä½“åˆšåº¦çŸ©é˜µ
 	cv::Mat *ptrK = new cv::Mat(cv::Mat::zeros(cv::Size(2 * (nelx + 1)*(nely + 1), 2 * (nelx + 1)*(nely + 1)), CV_32FC1));
-	//Á¦¾ØÕó
+	//åŠ›çŸ©é˜µ
 	cv::Mat *ptrF = new cv::Mat(cv::Mat::zeros(cv::Size(1, 2 * (nelx + 1)*(nely + 1)), CV_32FC1));
-	//È«¾Ö½ÚµãÎ»ÒÆ¾ØÕó
+	//å…¨å±€èŠ‚ç‚¹ä½ç§»çŸ©é˜µ
 	*ptrU = cv::Mat::zeros(cv::Size(1, 2 * (nelx + 1)*(nely + 1)), CV_32FC1);
 	for (int elx = 0; elx < nelx; ++elx) {
 		for (int ely = 0; ely < nely; ++ely) {
-			//¼ÆËã×óÉÏ½Çn1¡¢ÓÒÉÏ½Çn2µ¥Ôª½Úµã±àºÅ,µ¥ÔªµÄ±àºÅ¹æÔòÊÇ´Ó0¿ªÊ¼×İÏòÖğÁĞµİÔö£¬·ûºÏcpp±àÂëÏ°¹ß£¬¶ø·Çmatlab´Ó1±àÂë
+			//è®¡ç®—å·¦ä¸Šè§’n1ã€å³ä¸Šè§’n2å•å…ƒèŠ‚ç‚¹ç¼–å·,å•å…ƒçš„ç¼–å·è§„åˆ™æ˜¯ä»0å¼€å§‹çºµå‘é€åˆ—é€’å¢ï¼Œç¬¦åˆcppç¼–ç ä¹ æƒ¯ï¼Œè€Œématlabä»1ç¼–ç 
 			int n1 = (nely + 1)*elx + ely;
 			int n2 = (nely + 1)*(elx + 1) + ely;
-			//×é×°×ÜÌå¸Õ¶È¾ØÕóÊ±ĞèÒª²åÈëµÄÎ»ÖÃË÷Òı
+			//ç»„è£…æ€»ä½“åˆšåº¦çŸ©é˜µæ—¶éœ€è¦æ’å…¥çš„ä½ç½®ç´¢å¼•
 			std::vector<int> edof = { 2 * n1, 2 * n1 + 1, 2 * n2,2 * n2 + 1, 2 * n2 + 2, 2 * n2 + 3, 2 * n1 + 2, 2 * n1 + 3 };
 			for (int i = 0; i < 8; ++i) {
 				for (int j = 0; j < 8; ++j) {
@@ -22,15 +22,15 @@ cv::Mat* FE(const int nelx, const int nely, const cv::Mat& x, const float penal,
 			}
 		}
 	}
-	//Ê©¼ÓÔØºÉ,±¾ÀıÓ¦ÓÃÁËÒ»¸ö×óÉÏ½ÇµÄ´¹Ö±µ¥ÔªÁ¦
+	//æ–½åŠ è½½è·,æœ¬ä¾‹åº”ç”¨äº†ä¸€ä¸ªå·¦ä¸Šè§’çš„å‚ç›´å•å…ƒåŠ›
 	(*ptrF).at<float>(1, 0) = -1;
-	//Ê©¼ÓÔ¼Êø,×ó±ßµÚÒ»ÁĞºÍÓÒÏÂ½ÇÔ¼Êø,ÒÑ¾­¹Ì¶¨µÄ×ÔÓÉ¶ÈÔÚÈ«¾ÖÎ»ÒÆ¾ØÕóÖĞµÄË÷ÒıÏÂ±ê£¬Ô¼Êø×ó²àxºÍÓÒÏÂ½ÇµÄy·½Ïò×ÔÓÉ¶È
+	//æ–½åŠ çº¦æŸ,å·¦è¾¹ç¬¬ä¸€åˆ—å’Œå³ä¸‹è§’çº¦æŸ,å·²ç»å›ºå®šçš„è‡ªç”±åº¦åœ¨å…¨å±€ä½ç§»çŸ©é˜µä¸­çš„ç´¢å¼•ä¸‹æ ‡ï¼Œçº¦æŸå·¦ä¾§xå’Œå³ä¸‹è§’çš„yæ–¹å‘è‡ªç”±åº¦
 	std::vector<int> fixeddofs;
 	for (int i = 0; i < nely; ++i) {
 		fixeddofs.push_back(i * 2);
 	}
 	fixeddofs.push_back(2 * (nelx + 1)*(nely + 1) - 1);
-	//Ê£ÏÂµÄÎŞÔ¼Êø×ÔÓÉ¶ÈÔÚÈ«¾ÖÎ»ÒÆ¾ØÕóÖĞµÄÏÂ±êË÷Òı
+	//å‰©ä¸‹çš„æ— çº¦æŸè‡ªç”±åº¦åœ¨å…¨å±€ä½ç§»çŸ©é˜µä¸­çš„ä¸‹æ ‡ç´¢å¼•
 	std::list<int> prefreedofs;
 	for (int i = 0; i < 2 * (nelx + 1)*(nely + 1); ++i) {
 		prefreedofs.push_back(i);
@@ -38,25 +38,22 @@ cv::Mat* FE(const int nelx, const int nely, const cv::Mat& x, const float penal,
 	for (const auto& i : fixeddofs) {
 		prefreedofs.remove(i);
 	}
-	std::vector<int> freedofs(prefreedofs.begin(), prefreedofs.end());//´æ³Évector·½±ã½ÓÏÂÀ´¿ìËÙËæ»ú·ÃÎÊ
-	//Çó½âÏßĞÔ·½³Ì×é£¬µÃµ½¸÷½Úµãx¡¢y·½ÏòµÄÎ»ÒÆÖµ´¢´æÔÚUÖĞ
+	std::vector<int> freedofs(prefreedofs.begin(), prefreedofs.end());//å­˜æˆvectoræ–¹ä¾¿æ¥ä¸‹æ¥å¿«é€Ÿéšæœºè®¿é—®
+	//æ±‚è§£çº¿æ€§æ–¹ç¨‹ç»„ï¼Œå¾—åˆ°å„èŠ‚ç‚¹xã€yæ–¹å‘çš„ä½ç§»å€¼å‚¨å­˜åœ¨Uä¸­
 	cv::Mat *ptrcalculatingK = new cv::Mat(cv::Mat::zeros(cv::Size(freedofs.size(), freedofs.size()), CV_32FC1));
-	//cv::Mat calculatingK = cv::Mat::zeros(cv::Size(freedofs.size(), freedofs.size()), CV_32FC1);
 	for (int i = 0; i < freedofs.size(); ++i) {
 		for (int j = 0; j < freedofs.size(); ++j) {
 			(*ptrcalculatingK).at<float>(i, j) = (*ptrK).at<float>(freedofs[i], freedofs[j]);
 		}
 	}
 	cv::Mat *ptrcalculatingF = new cv::Mat(cv::Mat::zeros(cv::Size(1, freedofs.size()), CV_32FC1));
-	//cv::Mat calculatingF = cv::Mat::zeros(cv::Size(1, freedofs.size()), CV_32FC1);
 	for (int i = 0; i < freedofs.size(); ++i) {
 		(*ptrcalculatingF).at<float>(i, 0) = (*ptrF).at<float>(freedofs[i], 0);
 	}
 	cv::Mat *ptrcalculatingU = new cv::Mat(cv::Mat::zeros(cv::Size(1, freedofs.size()), CV_32FC1));
-	//cv::Mat calculatingU = cv::Mat::zeros(cv::Size(1, freedofs.size()), CV_32FC1);
 	*ptrcalculatingU = (*ptrcalculatingK).inv(cv::DECOMP_SVD)*(*ptrcalculatingF);
 	
-	//µÃµ½ÓÃÓÚ¼ÆËãµÄcalculatingUºó£¬½«Æä°´Î»ÖÃÌî»ØÔ­À´µÄÈ«¾ÖU
+	//å¾—åˆ°ç”¨äºè®¡ç®—çš„calculatingUåï¼Œå°†å…¶æŒ‰ä½ç½®å¡«å›åŸæ¥çš„å…¨å±€U
 	for (int i = 0; i < freedofs.size(); ++i) {
 		(*ptrU).at<float>(freedofs[i], 0) = (*ptrcalculatingU).at<float>(i, 0);
 	}
@@ -67,7 +64,5 @@ cv::Mat* FE(const int nelx, const int nely, const cv::Mat& x, const float penal,
 	delete ptrcalculatingF;
 	delete ptrcalculatingK;
 	delete ptrcalculatingU;
-	/*std::cout << "U:" << std::endl;
-	std::cout << (*ptrU).t() << std::endl;*/
 	return ptrU;
 }
